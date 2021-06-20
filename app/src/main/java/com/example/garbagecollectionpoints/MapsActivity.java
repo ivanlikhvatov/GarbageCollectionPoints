@@ -33,10 +33,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private DBHelper dbHelper;
+    private boolean isLogged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        isLogged = intent.getBooleanExtra("isLogged", false);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -56,7 +60,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onMapClick(LatLng latLng) {
-               createNewPoint(latLng);
+                if (isLogged) {
+                    createNewPoint(latLng);
+                } else {
+                    Intent i = new Intent(MapsActivity.this, LoginActivity.class);
+                    startActivity(i);
+                }
             }
         });
 
