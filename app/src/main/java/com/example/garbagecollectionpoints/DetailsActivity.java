@@ -68,7 +68,7 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
     @RequiresApi(api = Build.VERSION_CODES.O)
     private GarbagePoint getPointById(){
         SQLiteDatabase database = dbHelper.getWritableDatabase();
-        GarbagePoint garbagePoint = new GarbagePoint();
+        garbagePoint = new GarbagePoint();
 
         Cursor cursor =  database.rawQuery(
                 "select * from " + DBConstants.TABLE_POINTS.getName() +
