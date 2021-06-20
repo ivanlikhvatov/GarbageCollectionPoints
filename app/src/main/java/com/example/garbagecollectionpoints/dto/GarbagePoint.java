@@ -2,6 +2,8 @@ package com.example.garbagecollectionpoints.dto;
 
 import com.example.garbagecollectionpoints.enums.GarbageType;
 
+import java.time.LocalDateTime;
+
 public class GarbagePoint {
     private String id;
     private String name;
@@ -9,7 +11,7 @@ public class GarbagePoint {
     private String longitude;
     private GarbageType type;
     private String description;
-    private String date;
+    private LocalDateTime date;
 
     public GarbageType getType() {
         return type;
@@ -59,11 +61,11 @@ public class GarbagePoint {
         this.description = description;
     }
 
-    public String getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 }

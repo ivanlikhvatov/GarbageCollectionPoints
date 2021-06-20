@@ -74,9 +74,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getAllInfoAboutGarbagePoint(Marker marker) {
-        String markerTitle = marker.getTitle();
         Intent intent = new Intent(MapsActivity.this, DetailsActivity.class);
-        intent.putExtra("title", markerTitle);
+        intent.putExtra("coordinate", marker.getPosition());
         startActivity(intent);
     }
 

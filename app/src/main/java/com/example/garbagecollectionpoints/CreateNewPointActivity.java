@@ -12,8 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-
 import com.example.garbagecollectionpoints.db.DBConstants;
 import com.example.garbagecollectionpoints.db.DBHelper;
 import com.example.garbagecollectionpoints.dto.GarbagePoint;
@@ -22,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class CreateNewPointActivity extends AppCompatActivity implements View.OnClickListener {
     private GarbagePoint garbagePoint;
@@ -51,7 +50,7 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
 
         String latitude = Double.toString(markerOptions.getPosition().latitude);
         String longitude = Double.toString(markerOptions.getPosition().longitude);
-        String date = LocalDate.now().toString();
+        LocalDateTime date = LocalDateTime.now();
         String id = (latitude + longitude).replaceAll("\\.", "");
 
         garbagePoint.setLatitude(latitude);
@@ -69,12 +68,13 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
         contentValues.put(DBConstants.KEY_LATITUDE.getName(), garbagePoint.getLatitude());
         contentValues.put(DBConstants.KEY_LONGITUDE.getName(), garbagePoint.getLongitude());
         contentValues.put(DBConstants.KEY_DESCRIPTION.getName(), garbagePoint.getDescription());
-        contentValues.put(DBConstants.KEY_DATE.getName(), garbagePoint.getDate());
+        contentValues.put(DBConstants.KEY_DATE.getName(), garbagePoint.getDate().toString());
         contentValues.put(DBConstants.KEY_TYPE.getName(), garbagePoint.getType().toString());
 
         database.insert(DBConstants.TABLE_POINTS.getName(), null, contentValues);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -86,10 +86,7 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
                 garbagePoint.setType(enumType);
                 garbagePoint.setDescription(description.getText().toString());
 
-                System.out.println(description.getText().toString());
-
                 savePoint();
-
                 Intent intent = new Intent(CreateNewPointActivity.this, MapsActivity.class);
                 startActivity(intent);
                 break;
