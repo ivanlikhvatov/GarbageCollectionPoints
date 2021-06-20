@@ -68,4 +68,17 @@ public class GarbagePoint {
     public void setDate(LocalDateTime date) {
         this.date = date;
     }
+
+    @Override
+    public String toString() {
+        return "GarbagePoint{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", latitude='" + latitude + '\'' +
+                ", longitude='" + longitude + '\'' +
+                ", type=" + type +
+                ", description='" + description + '\'' +
+                ", date=" + date +
+                '}';
+    }
 }

@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -18,12 +20,15 @@ import com.example.garbagecollectionpoints.dto.GarbagePoint;
 import com.example.garbagecollectionpoints.enums.GarbageType;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
 
 public class DetailsActivity extends AppCompatActivity implements View.OnClickListener{
     private GarbagePoint garbagePoint;
-    private TextView nameView, typeView, descriptionView, dateView;
+    private TextView nameView, typeView, descriptionView, dateView, addressView;
     private DBHelper dbHelper;
     private static final String DATE_PATTERN = "dd-MM-yyyy";
     private Button btnDelete;
@@ -34,12 +39,14 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        garbagePoint = new GarbagePoint();
 
         dbHelper = new DBHelper(this);
         nameView = findViewById(R.id.name);
         typeView = findViewById(R.id.type);
         descriptionView = findViewById(R.id.description);
         dateView = findViewById(R.id.date);
+        addressView = findViewById(R.id.address);
 
         btnDelete = findViewById(R.id.btnDelete);
         btnDelete.setOnClickListener(this);
@@ -48,8 +55,8 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         String latitude = Double.toString(coordinates.latitude);
         String longitude = Double.toString(coordinates.longitude);
         String pointId = (latitude + longitude).replaceAll("\\.", "");
-
         garbagePoint.setId(pointId);
+
         getPointById();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
@@ -58,17 +65,19 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
                 + garbagePoint.getDate().getHour() + " часов "
                 + garbagePoint.getDate().getMinute() + " минут";
 
+        String address = getAddress();
+
         nameView.setText(garbagePoint.getName());
         typeView.setText(garbagePoint.getType().getText());
         descriptionView.setText(garbagePoint.getDescription());
-
         dateView.setText(date);
+        addressView.setText(address);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private GarbagePoint getPointById(){
+    private void getPointById(){
         SQLiteDatabase database = dbHelper.getWritableDatabase();
-        garbagePoint = new GarbagePoint();
 
         Cursor cursor =  database.rawQuery(
                 "select * from " + DBConstants.TABLE_POINTS.getName() +
@@ -94,8 +103,6 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
             }
             cursor.close();
         }
-        return garbagePoint;
-
     }
 
     @Override
@@ -106,6 +113,26 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
                 Intent intent = new Intent(DetailsActivity.this, MapsActivity.class);
                 startActivity(intent);
                 break;
+        }
+    }
+
+    private String getAddress(){
+        Geocoder gcd = new Geocoder(this, Locale.getDefault());
+        List<Address> addresses = null;
+
+        try {
+            double longitude = Double.parseDouble(garbagePoint.getLongitude());
+            double latitude = Double.parseDouble(garbagePoint.getLatitude());
+            addresses = gcd.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (addresses != null && addresses.size() > 0) {
+            return  addresses.get(0).getAddressLine(0);
+        }
+        else {
+            return "не установленный адрес";
         }
     }
 

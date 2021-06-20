@@ -5,6 +5,8 @@ import androidx.fragment.app.FragmentActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +24,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.garbagecollectionpoints.databinding.ActivityMapsBinding;
 import androidx.annotation.RequiresApi;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -49,7 +55,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        printAllGarbage(googleMap);
+        try {
+            printAllGarbage(googleMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -74,6 +84,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getAllInfoAboutGarbagePoint(Marker marker) {
+        if (marker.getTitle().equals("Saratov")){
+            return;
+        }
+
         Intent intent = new Intent(MapsActivity.this, DetailsActivity.class);
         intent.putExtra("coordinate", marker.getPosition());
         startActivity(intent);
@@ -86,9 +100,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-    private void printAllGarbage(GoogleMap googleMap) {
+    private void printAllGarbage(GoogleMap googleMap) throws IOException {
         map = googleMap;
-        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         LatLng saratov = new LatLng(51.539482738188,46.01493146270514);
         map.addMarker(new MarkerOptions().position(saratov).title("Saratov"));
