@@ -61,7 +61,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Intent i = new Intent(MapsActivity.this, LoginActivity.class);
                     startActivity(i);
                 }
-                createNewPoint(latLng);
             }
         });
 
