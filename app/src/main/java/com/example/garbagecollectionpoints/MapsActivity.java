@@ -90,9 +90,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        LatLng sydney = new LatLng(51.539482738188,46.01493146270514);
-        map.addMarker(new MarkerOptions().position(sydney).title("Saratov"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng saratov = new LatLng(51.539482738188,46.01493146270514);
+        map.addMarker(new MarkerOptions().position(saratov).title("Saratov"));
+        map.moveCamera(CameraUpdateFactory.newLatLng(saratov));
 
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 

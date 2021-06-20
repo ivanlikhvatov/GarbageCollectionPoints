@@ -3,10 +3,13 @@ package com.example.garbagecollectionpoints;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.garbagecollectionpoints.db.DBConstants;
@@ -15,21 +18,20 @@ import com.example.garbagecollectionpoints.dto.GarbagePoint;
 import com.example.garbagecollectionpoints.enums.GarbageType;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements View.OnClickListener{
+    private GarbagePoint garbagePoint;
     private TextView nameView, typeView, descriptionView, dateView;
     private DBHelper dbHelper;
     private static final String DATE_PATTERN = "dd-MM-yyyy";
+    private Button btnDelete;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        System.out.println("AAAAAAAAAAAAAAA");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
@@ -39,12 +41,17 @@ public class DetailsActivity extends AppCompatActivity {
         descriptionView = findViewById(R.id.description);
         dateView = findViewById(R.id.date);
 
+        btnDelete = findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(this);
+
         LatLng coordinates = getIntent().getParcelableExtra("coordinate");
         String latitude = Double.toString(coordinates.latitude);
         String longitude = Double.toString(coordinates.longitude);
         String pointId = (latitude + longitude).replaceAll("\\.", "");
 
-        GarbagePoint garbagePoint = getPointById(pointId);
+        garbagePoint.setId(pointId);
+        getPointById();
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
         String date = garbagePoint.getDate().format(formatter) + " "
@@ -56,20 +63,16 @@ public class DetailsActivity extends AppCompatActivity {
         descriptionView.setText(garbagePoint.getDescription());
 
         dateView.setText(date);
-
-
-        System.out.println("AAAAAAAAAAAAAAA");
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private GarbagePoint getPointById(String id){
+    private GarbagePoint getPointById(){
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         GarbagePoint garbagePoint = new GarbagePoint();
 
         Cursor cursor =  database.rawQuery(
                 "select * from " + DBConstants.TABLE_POINTS.getName() +
-                        " where " + DBConstants.KEY_ID.getName() + "=" + id  , null);
+                        " where " + DBConstants.KEY_ID.getName() + "=" + garbagePoint.getId()  , null);
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -93,5 +96,20 @@ public class DetailsActivity extends AppCompatActivity {
         }
         return garbagePoint;
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnDelete:
+                deletePoint();
+                Intent intent = new Intent(DetailsActivity.this, MapsActivity.class);
+                startActivity(intent);
+                break;
+        }
+    }
+
+    private void deletePoint() {
+        //logic for delete from db
     }
 }

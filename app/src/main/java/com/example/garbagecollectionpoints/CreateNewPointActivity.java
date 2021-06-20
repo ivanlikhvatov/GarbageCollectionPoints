@@ -19,7 +19,6 @@ import com.example.garbagecollectionpoints.enums.GarbageType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class CreateNewPointActivity extends AppCompatActivity implements View.OnClickListener {
