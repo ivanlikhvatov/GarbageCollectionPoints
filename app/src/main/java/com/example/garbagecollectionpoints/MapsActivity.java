@@ -15,6 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         LatLng sydney = new LatLng(51.539482738188,46.01493146270514);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Saratov"));
@@ -56,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(LatLng latLng) {
                 MarkerOptions newPoint = new MarkerOptions().position(latLng).title("name");
+
                 String latitude = Double.toString(newPoint.getPosition().latitude);
                 String longitude = Double.toString(newPoint.getPosition().longitude);
                 String date = LocalDate.now().toString();
@@ -74,7 +77,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 database.insert(DBConstants.TABLE_POINTS.getName(), null, contentValues);
 
-                mMap.addMarker(newPoint);
+                Marker marker = mMap.addMarker(newPoint);
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.blue));
             }
         });
 
