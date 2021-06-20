@@ -162,6 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("mLog", "0 rows");
         }
 
+        //
         cursor.close();
     }
 }
