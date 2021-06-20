@@ -1,7 +1,7 @@
 package com.example.garbagecollectionpoints.db;
 
 public enum DBConstants {
-    DATABASE_NAME("GCPoints"),
+    DATABASE_NAME("GarbageCollectionPoints"),
 
     TABLE_POINTS("points"),
     KEY_ID("_id"),
