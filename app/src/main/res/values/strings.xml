@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">GarbageCollectionPoints</string>
     <string name="title_activity_maps">Map</string>
+
+    <string-array name="garbageTypes">
+        <item>целлюлоза</item>
+        <item>металлические/химические/пластиковые отходы</item>
+        <item>биологические отходы</item>
+        <item>стекло</item>
+    </string-array>
 </resources>

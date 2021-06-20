@@ -1,12 +1,12 @@
 package com.example.garbagecollectionpoints.enums;
 
-public enum GarbageTypes {
+public enum GarbageType {
     PAPER_BIN("paper", "целлюлоза"),
     PACKING_MATERIAL_BIN("metal", "металлические/химические/пластиковые отходы"),
     COMPOST_BIN("bio materials", "биологические отходы"),
     GLASS_BIN("glass", "стекло");
 
-    GarbageTypes(String value, String text) {
+    GarbageType(String value, String text) {
         this.value = value;
         this.text = text;
     }
@@ -28,5 +28,15 @@ public enum GarbageTypes {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public static GarbageType getEnumByText(String text){
+        for (GarbageType type : values()) {
+            if (type.getText().equals(text)) {
+                return type;
+            }
+        }
+
+        throw new IllegalArgumentException("No enum found with url: [" + text + "]");
     }
 }
