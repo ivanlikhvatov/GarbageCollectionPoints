@@ -7,12 +7,14 @@
 	
    $email = $_POST['email'];
    $password = $_POST['password'];
-   $result = mysqli_query($con,"SELECT id FROM user WHERE email='$email' AND password='$password'");
+   //$result = mysqli_query($con, "SELECT * FROM user WHERE email='$email' AND password='$password'");
+   $result = mysqli_query($con, "SELECT role FROM user WHERE email='$email' AND password='$password'");
    $row = mysqli_fetch_array($result);
    $data = $row[0];
 
    if ($data) {
-      echo "login:success";
+      //echo "id: " . $row[0]["id"] . " name: " . $row[1]["name"]. " email: " . $row[2]["email"] . " password: " . $row[3]["password"] . "<br>";
+      echo "login:success ".$data;
    } else {
       echo "login:unsuccess";
    }
