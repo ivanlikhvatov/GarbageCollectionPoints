@@ -102,8 +102,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // Snack Bar to show success message that record is wrong
             Snackbar.make(nestedScrollView, getString(R.string.error_valid_email_password), Snackbar.LENGTH_LONG).show();
         }*/
-        System.out.println(textInputEditTextEmail.getText() + " " + textInputEditTextPassword.getText());
         new SignInActivity(this).execute(
+                "login",
                 textInputEditTextEmail.getText().toString(),
                 textInputEditTextPassword.getText().toString()
         );

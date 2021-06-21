@@ -107,7 +107,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 textInputLayoutConfirmPassword, getString(R.string.error_password_match))) {
             return;
         }
-        if (!databaseHelper.checkUser(textInputEditTextEmail.getText().toString().trim())) {
+
+        new SignInActivity(this).execute(
+                "register",
+                textInputEditTextName.getText().toString(),
+                textInputEditTextEmail.getText().toString(),
+                textInputEditTextPassword.getText().toString()
+        );
+
+        /*if (!databaseHelper.checkUser(textInputEditTextEmail.getText().toString().trim())) {
             user.setName(textInputEditTextName.getText().toString().trim());
             user.setEmail(textInputEditTextEmail.getText().toString().trim());
             user.setPassword(textInputEditTextPassword.getText().toString().trim());
@@ -123,7 +131,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         } else {
             // Snack Bar to show error message that record already exists
             Snackbar.make(nestedScrollView, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG).show();
-        }
+        }*/
     }
     /**
      * This method is to empty all input edit text

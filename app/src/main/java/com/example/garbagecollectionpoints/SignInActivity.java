@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 public class SignInActivity extends AsyncTask<String, String, String> {
+    private static final String path = "http://10.0.2.2:80/";
     private Context context;
 
     public SignInActivity(Context context) {
@@ -24,14 +25,33 @@ public class SignInActivity extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... arg0) {
         try {
-            String username = (String)arg0[0];
-            String password = (String)arg0[1];
+            String type = (String)arg0[0];
+            String
+                    link = "",
+                    data = "";
 
-            String link = "http://10.0.2.2:80/login_user.php";
-            String data  = URLEncoder.encode("username", "UTF-8") + "=" +
-                    URLEncoder.encode(username, "UTF-8");
-            data += "&" + URLEncoder.encode("password", "UTF-8") + "=" +
-                    URLEncoder.encode(password, "UTF-8");
+            if (type.equals("login")) {
+                String email = (String) arg0[1];
+                String password = (String) arg0[2];
+
+                link = this.path + "login_user.php";
+                data = URLEncoder.encode("email", "UTF-8") + "=" +
+                        URLEncoder.encode(email, "UTF-8");
+                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" +
+                        URLEncoder.encode(password, "UTF-8");
+            } else if (type.equals("register")) {
+                String name = (String) arg0[1];
+                String email = (String) arg0[2];
+                String password = (String) arg0[3];
+
+                link = this.path + "register_user.php";
+                data = URLEncoder.encode("name", "UTF-8") + "=" +
+                        URLEncoder.encode(name, "UTF-8");
+                data += "&" + URLEncoder.encode("email", "UTF-8") + "=" +
+                        URLEncoder.encode(email, "UTF-8");
+                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" +
+                        URLEncoder.encode(password, "UTF-8");
+            }
 
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
@@ -43,7 +63,7 @@ public class SignInActivity extends AsyncTask<String, String, String> {
 
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
-            wr.write( data );
+            wr.write(data);
             wr.flush();
 
             BufferedReader reader = new BufferedReader(new
@@ -69,6 +89,9 @@ public class SignInActivity extends AsyncTask<String, String, String> {
             Intent map = new Intent(this.context, MapsActivity.class);
             map.putExtra("isLogged", true);
             context.startActivity(map);
+        } else if (result.equals("register:success")) {
+            Intent login = new Intent(this.context, LoginActivity.class);
+            context.startActivity(login);
         }
 
     }
