@@ -10,7 +10,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.widget.NestedScrollView;
 
 import com.example.garbagecollectionpoints.db.DBHelper;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -102,7 +101,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // Snack Bar to show success message that record is wrong
             Snackbar.make(nestedScrollView, getString(R.string.error_valid_email_password), Snackbar.LENGTH_LONG).show();
         }*/
-        new SignInActivity(this).execute(
+        new PHPExecuteActivity(this).execute(
                 "login",
                 textInputEditTextEmail.getText().toString(),
                 textInputEditTextPassword.getText().toString()

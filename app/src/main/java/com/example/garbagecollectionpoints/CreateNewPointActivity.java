@@ -28,7 +28,6 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
     private EditText nameInput, description;
     private Spinner spinner;
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
     }
 
     private void savePoint() {
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        /*SQLiteDatabase database = dbHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(DBConstants.KEY_ID.getName(), garbagePoint.getId());
@@ -70,7 +69,17 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
         contentValues.put(DBConstants.KEY_DATE.getName(), garbagePoint.getDate().toString());
         contentValues.put(DBConstants.KEY_TYPE.getName(), garbagePoint.getType().toString());
 
-        database.insert(DBConstants.TABLE_POINTS.getName(), null, contentValues);
+        database.insert(DBConstants.TABLE_POINTS.getName(), null, contentValues);*/
+
+        new PHPExecuteActivity(this).execute(
+                "createBin",
+                garbagePoint.getName(),
+                garbagePoint.getLatitude(),
+                garbagePoint.getLongitude(),
+                garbagePoint.getType().toString(),
+                garbagePoint.getDescription(),
+                garbagePoint.getDate().toString()
+        );
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

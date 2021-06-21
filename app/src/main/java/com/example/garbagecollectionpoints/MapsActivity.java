@@ -16,6 +16,7 @@ import android.widget.EditText;
 
 import com.example.garbagecollectionpoints.db.DBConstants;
 import com.example.garbagecollectionpoints.db.DBHelper;
+import com.example.garbagecollectionpoints.dto.GarbagePoint;
 import com.example.garbagecollectionpoints.enums.GarbageType;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,6 +30,7 @@ import com.example.garbagecollectionpoints.databinding.ActivityMapsBinding;
 import androidx.annotation.RequiresApi;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +43,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker findPlace;
     private boolean isLogged = false;
     private boolean isAdmin = false;
+    private boolean isBinsLoaded = false;
+    private ArrayList<GarbagePoint> gb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = getIntent();
         isLogged = intent.getBooleanExtra("isLogged", false);
         isAdmin = intent.getBooleanExtra("isAdmin", false);
+        //gb = intent.get
+        isBinsLoaded = intent.getBooleanExtra("isBinsLoaded", false);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -124,10 +130,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void printAllGarbage(GoogleMap googleMap) throws IOException {
         map = googleMap;
 
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        //SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        //ArrayList<GarbagePoint> gp;
+
+        if (!isBinsLoaded) {
+            new PHPExecuteActivity(this).execute("getAllBins");
+            return;
+        }
 
 
-        Cursor cursor = database.query(
+
+        /*Cursor cursor = database.query(
                 DBConstants.TABLE_POINTS.getName(),
                 null,
                 null,
@@ -135,9 +149,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 null,
                 null,
                 null
-        );
+        );*/
 
-        if (cursor.moveToFirst()) {
+        /*if (cursor.moveToFirst()) {
             int nameIndex = cursor.getColumnIndex(DBConstants.KEY_NAME.getName());
             int latitudeIndex = cursor.getColumnIndex(DBConstants.KEY_LATITUDE.getName());
             int longitudeIndex = cursor.getColumnIndex(DBConstants.KEY_LONGITUDE.getName());
@@ -173,9 +187,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } while (cursor.moveToNext());
         } else {
             Log.d("mLog", "0 rows");
-        }
+        }*/
 
-        cursor.close();
+        //cursor.close();
     }
 
     @Override

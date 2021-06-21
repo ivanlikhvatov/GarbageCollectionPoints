@@ -1,6 +1,5 @@
 package com.example.garbagecollectionpoints;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,7 +10,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.widget.NestedScrollView;
 
 import com.example.garbagecollectionpoints.db.DBHelper;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -108,7 +106,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             return;
         }
 
-        new SignInActivity(this).execute(
+        new PHPExecuteActivity(this).execute(
                 "register",
                 textInputEditTextName.getText().toString(),
                 textInputEditTextEmail.getText().toString(),
