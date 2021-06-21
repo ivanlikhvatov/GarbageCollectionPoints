@@ -16,7 +16,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private final AppCompatActivity activity = LoginActivity.this;
-    private NestedScrollView nestedScrollView;
+    public NestedScrollView nestedScrollView;
     private TextInputLayout textInputLayoutEmail;
     private TextInputLayout textInputLayoutPassword;
     private TextInputEditText textInputEditTextEmail;
@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (!inputValidation.isInputEditTextFilled(textInputEditTextPassword, textInputLayoutPassword, getString(R.string.error_message_email))) {
             return;
         }
-        if (databaseHelper.checkUser(textInputEditTextEmail.getText().toString().trim()
+        /*if (databaseHelper.checkUser(textInputEditTextEmail.getText().toString().trim()
                 , textInputEditTextPassword.getText().toString().trim())) {
             Intent map = new Intent(activity, MapsActivity.class);
             //accountsIntent.putExtra("EMAIL", textInputEditTextEmail.getText().toString().trim());
@@ -101,7 +101,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else {
             // Snack Bar to show success message that record is wrong
             Snackbar.make(nestedScrollView, getString(R.string.error_valid_email_password), Snackbar.LENGTH_LONG).show();
-        }
+        }*/
+        System.out.println(textInputEditTextEmail.getText() + " " + textInputEditTextPassword.getText());
+        new SignInActivity(this).execute(
+                textInputEditTextEmail.getText().toString(),
+                textInputEditTextPassword.getText().toString()
+        );
     }
     /**
      * This method is to empty all input edit text
