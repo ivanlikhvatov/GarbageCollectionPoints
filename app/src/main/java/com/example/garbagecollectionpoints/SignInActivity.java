@@ -84,10 +84,20 @@ public class SignInActivity extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected void onPostExecute(String result){
-        if (result.equals("login:success")) {
+    protected void onPostExecute(String result) {
+        System.out.println(result);
+
+        if (result.contains("login:success")) {
             Intent map = new Intent(this.context, MapsActivity.class);
             map.putExtra("isLogged", true);
+
+            for (String str : result.split(" ")) {
+                if (str.equals("admin")) {
+                    map.putExtra("isAdmin", true);
+                    break;
+                }
+            }
+
             context.startActivity(map);
         } else if (result.equals("register:success")) {
             Intent login = new Intent(this.context, LoginActivity.class);
