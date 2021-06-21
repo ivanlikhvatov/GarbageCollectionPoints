@@ -10,6 +10,9 @@ import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.garbagecollectionpoints.db.DBConstants;
 import com.example.garbagecollectionpoints.db.DBHelper;
@@ -29,11 +32,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener{
     private GoogleMap map;
     private ActivityMapsBinding binding;
     private DBHelper dbHelper;
+    private Button btnFind, createButton;
+    private EditText etPlace;
+    private Marker findPlace;
     private boolean isLogged = false;
     private boolean isAdmin = false;
 
@@ -53,6 +58,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         dbHelper = new DBHelper(this);
+
+        btnFind = findViewById(R.id.btnFind);
+        btnFind.setOnClickListener(this);
+
+        etPlace = findViewById(R.id.et_place);
     }
 
     @Override
@@ -77,6 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onMarkerClick(Marker marker) {
                 getAllInfoAboutGarbagePoint(marker);
@@ -85,8 +96,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getAllInfoAboutGarbagePoint(Marker marker) {
-        if (marker.getTitle().equals("Saratov")){
+        if (marker.getTitle().equals("Найденное место")){
+            if (isLogged) {
+                createNewPoint(marker.getPosition());
+            } else {
+                Intent i = new Intent(MapsActivity.this, LoginActivity.class);
+                startActivity(i);
+            }
+
             return;
         }
 
@@ -104,11 +123,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void printAllGarbage(GoogleMap googleMap) throws IOException {
         map = googleMap;
-//        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-
-        LatLng saratov = new LatLng(51.539482738188,46.01493146270514);
-        map.addMarker(new MarkerOptions().position(saratov).title("Saratov"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(saratov));
 
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
@@ -162,5 +176,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         cursor.close();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnFind:
+                Geocoder geocoder = new Geocoder(this);
+                List<Address> addresses1;
+                try {
+                    addresses1 = geocoder.getFromLocationName(etPlace.getText().toString(), 1);
+
+                    if(addresses1.size() > 0) {
+                        if (findPlace != null){
+                            findPlace.remove();
+                        }
+
+                        double latitude = addresses1.get(0).getLatitude();
+                        double longitude = addresses1.get(0).getLongitude();
+
+                        LatLng coordinates = new LatLng(latitude,longitude);
+                        findPlace = map.addMarker(new MarkerOptions().position(coordinates).title("Найденное место"));
+                        map.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+        }
     }
 }
