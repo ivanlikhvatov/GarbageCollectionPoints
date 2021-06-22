@@ -29,19 +29,60 @@ import java.util.Locale;
 public class DetailsActivity extends AppCompatActivity implements View.OnClickListener{
     private GarbagePoint garbagePoint;
     private TextView nameView, typeView, descriptionView, dateView, addressView;
-    private DBHelper dbHelper;
     private static final String DATE_PATTERN = "dd-MM-yyyy";
     private Button btnDelete;
-
+    private boolean isBinLoaded = false;
+    private String bin;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_details);
         garbagePoint = new GarbagePoint();
 
-        dbHelper = new DBHelper(this);
+        //Intent intent = getIntent();
+        /*isBinLoaded = intent.getBooleanExtra("isBinLoaded", false);
+
+        if (!isBinLoaded) {
+            LatLng coordinates = intent.getParcelableExtra("coordinate");
+            String latitude = Double.toString(coordinates.latitude);
+            String longitude = Double.toString(coordinates.longitude);
+            String pointId = (latitude + longitude).replaceAll("\\.", "");
+            garbagePoint.setId(pointId);
+            new PHPExecuteActivity(this).execute(
+                    "getBinById",
+                    garbagePoint.getId()
+            );
+            return;
+        }*/
+
+        getPointById();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void getPointById() {
+        Intent intent = getIntent();
+        bin = intent.getStringExtra("bin");
+
+        String[] str = bin.split("\\*");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
+
+        garbagePoint.setDate(LocalDateTime.parse(str[7]));
+        garbagePoint.setDescription(str[6]);
+        garbagePoint.setType(GarbageType.valueOf(str[5]));
+        garbagePoint.setLatitude(str[3]);
+        garbagePoint.setLongitude(str[4]);
+        garbagePoint.setName(str[2]);
+        garbagePoint.setId(str[1]);
+
+        String date = garbagePoint.getDate().format(formatter) + " "
+                + garbagePoint.getDate().getHour() + " часов "
+                + garbagePoint.getDate().getMinute() + " минут";
+
+        String address = getAddress();
+
+        setContentView(R.layout.activity_details);
         nameView = findViewById(R.id.name);
         typeView = findViewById(R.id.type);
         descriptionView = findViewById(R.id.description);
@@ -51,68 +92,21 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         btnDelete = findViewById(R.id.btnDelete);
         btnDelete.setOnClickListener(this);
 
-        LatLng coordinates = getIntent().getParcelableExtra("coordinate");
-        String latitude = Double.toString(coordinates.latitude);
-        String longitude = Double.toString(coordinates.longitude);
-        String pointId = (latitude + longitude).replaceAll("\\.", "");
-        garbagePoint.setId(pointId);
-
-        getPointById();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
-
-        String date = garbagePoint.getDate().format(formatter) + " "
-                + garbagePoint.getDate().getHour() + " часов "
-                + garbagePoint.getDate().getMinute() + " минут";
-
-        String address = getAddress();
-
         nameView.setText(garbagePoint.getName());
         typeView.setText(garbagePoint.getType().getText());
         descriptionView.setText(garbagePoint.getDescription());
         dateView.setText(date);
         addressView.setText(address);
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void getPointById(){
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-
-        Cursor cursor =  database.rawQuery(
-                "select * from " + DBConstants.TABLE_POINTS.getName() +
-                        " where " + DBConstants.KEY_ID.getName() + "=" + garbagePoint.getId()  , null);
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                String name = cursor.getString(cursor.getColumnIndex(DBConstants.KEY_NAME.getName()));
-                String latitude = cursor.getString(cursor.getColumnIndex(DBConstants.KEY_LATITUDE.getName()));
-                String longitude = cursor.getString(cursor.getColumnIndex(DBConstants.KEY_LONGITUDE.getName()));
-                GarbageType type = GarbageType.valueOf(cursor.getString(cursor.getColumnIndex(DBConstants.KEY_TYPE.getName())));
-                String description = cursor.getString(cursor.getColumnIndex(DBConstants.KEY_DESCRIPTION.getName()));
-
-                LocalDateTime date = LocalDateTime.parse(cursor.getString(cursor.getColumnIndex(DBConstants.KEY_DATE.getName())));
-
-                garbagePoint.setName(name);
-                garbagePoint.setType(type);
-                garbagePoint.setDescription(description);
-                garbagePoint.setLongitude(longitude);
-                garbagePoint.setLatitude(latitude);
-                garbagePoint.setDate(date);
-
-            }
-            cursor.close();
-        }
+        System.out.println(garbagePoint.toString());
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnDelete:
-                deletePoint();
-                Intent intent = new Intent(DetailsActivity.this, MapsActivity.class);
-                startActivity(intent);
-                break;
+                if (PHPExecuteActivity.getUSER().isAdmin()){
+                    deletePoint();
+                }
         }
     }
 
@@ -137,6 +131,9 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void deletePoint() {
-        //logic for delete from db
+        new PHPExecuteActivity(this).execute(
+                "deleteBin",
+                garbagePoint.getId()
+        );
     }
 }

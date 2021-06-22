@@ -5,7 +5,34 @@ public class User {
     private String
             name,
             email,
-            password;
+            password,
+            role;
+    private boolean isAdmin;
+    private boolean isLogged;
+
+    public User(String role, boolean isAdmin) {
+        this.role = role;
+        this.isAdmin = isAdmin;
+    }
+
+    public User() {
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public boolean isLogged() {
+        return isLogged;
+    }
+
+    public void setLogged(boolean logged) {
+        isLogged = logged;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
 
     public int getId() {
         return id;

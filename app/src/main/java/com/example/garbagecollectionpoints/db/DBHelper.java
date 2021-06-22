@@ -63,7 +63,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<User> getAllUser() {
+    /*public List<User> getAllUser() {
 
         String[] columns = {
                 DBConstants.USER_KEY_ID.getName(),
@@ -75,12 +75,12 @@ public class DBHelper extends SQLiteOpenHelper {
         String sortOrder = DBConstants.USER_KEY_NAME.getName() + " ASC";
         List<User> userList = new ArrayList<User>();
         SQLiteDatabase db = this.getReadableDatabase();
-        // query the user table
-        /**
-         * Here query function is used to fetch records from user table this function works like we use sql query.
-         * SQL query equivalent to this query function is
-         * SELECT user_id,user_name,user_email,user_password FROM user ORDER BY user_name;
-         */
+        query the user table
+
+         Here query function is used to fetch records from user table this function works like we use sql query.
+         SQL query equivalent to this query function is
+         SELECT user_id,user_name,user_email,user_password FROM user ORDER BY user_name;
+
         Cursor cursor = db.query(
                 DBConstants.USER_TABLE.getName(),
                 columns,
@@ -140,7 +140,7 @@ public class DBHelper extends SQLiteOpenHelper {
         );
 
         db.close();
-    }
+    }*/
 
     public boolean checkUser(String email) {
         // array of columns to fetch

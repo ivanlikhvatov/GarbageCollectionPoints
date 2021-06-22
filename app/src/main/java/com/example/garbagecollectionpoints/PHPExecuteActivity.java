@@ -6,9 +6,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,13 +15,10 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.garbagecollectionpoints.db.DBConstants;
-import com.example.garbagecollectionpoints.dto.GarbagePoint;
-import com.example.garbagecollectionpoints.enums.GarbageType;
-
 public class PHPExecuteActivity extends AsyncTask<String, String, String> {
     private static final String path = "http://10.0.2.2:80/";
     private Context context;
+    private static User USER = new User();
 
     public PHPExecuteActivity(Context context) {
         this.context = context;
@@ -62,15 +57,18 @@ public class PHPExecuteActivity extends AsyncTask<String, String, String> {
                 data += "&" + URLEncoder.encode("password", "UTF-8") + "=" +
                         URLEncoder.encode(password, "UTF-8");
             } else if (type.equals("createBin")) {
-                String name = (String) arg0[1];
-                String latitude = (String) arg0[2];
-                String longtitude = (String) arg0[3];
-                String binType = (String) arg0[4];
-                String desc = (String) arg0[5];
-                String date = (String) arg0[6];
+                String id = (String) arg0[1];
+                String name = (String) arg0[2];
+                String latitude = (String) arg0[3];
+                String longtitude = (String) arg0[4];
+                String binType = (String) arg0[5];
+                String desc = (String) arg0[6];
+                String date = (String) arg0[7];
 
                 link = this.path + "bin_create.php";
-                data = URLEncoder.encode("name", "UTF-8") + "=" +
+                data = URLEncoder.encode("id", "UTF-8") + "=" +
+                        URLEncoder.encode(id, "UTF-8");
+                data += "&" + URLEncoder.encode("name", "UTF-8") + "=" +
                         URLEncoder.encode(name, "UTF-8");
                 data += "&" + URLEncoder.encode("latitude", "UTF-8") + "=" +
                         URLEncoder.encode(latitude, "UTF-8");
@@ -84,6 +82,16 @@ public class PHPExecuteActivity extends AsyncTask<String, String, String> {
                         URLEncoder.encode(date, "UTF-8");
             } else if (type.equals("getAllBins")) {
                 link = this.path + "get_bins.php";
+            } else if (type.equals("getBinById")) {
+                String id = (String) arg0[1];
+                link = this.path + "get_bin.php";
+                data = URLEncoder.encode("id", "UTF-8") + "=" +
+                        URLEncoder.encode(id, "UTF-8");
+            } else if (type.equals("deleteBin")) {
+                String id = (String) arg0[1];
+                link = this.path + "delete_bin.php";
+                data = URLEncoder.encode("id", "UTF-8") + "=" +
+                        URLEncoder.encode(id, "UTF-8");
             }
 
             URL url = new URL(link);
@@ -125,9 +133,13 @@ public class PHPExecuteActivity extends AsyncTask<String, String, String> {
             Intent map = new Intent(this.context, MapsActivity.class);
             map.putExtra("isLogged", true);
 
+            USER.setLogged(true);
+            USER.setAdmin(false);
+
             for (String str : result.split(" ")) {
                 if (str.equals("admin")) {
                     map.putExtra("isAdmin", true);
+                    USER.setAdmin(true);
                     break;
                 }
             }
@@ -139,52 +151,38 @@ public class PHPExecuteActivity extends AsyncTask<String, String, String> {
         } else if (result.contains("getBins:success")) {
             Intent map = new Intent(this.context, MapsActivity.class);
 
-            ArrayList<GarbagePoint> gb = new ArrayList<>();
+            String r = "\\|";
+            String[] str = result.split(r);
+            ArrayList<String> arr = new ArrayList<>();
 
-            for (String str : result.split("|")) {
-                GarbagePoint g = new GarbagePoint();
-                int i = 0;
-                for (String st : str.split(" ")) {
-                    System.out.println(st);
-                    switch (i) {
-                        case 0: {
-                            g.setId(st);
-                        }
-
-                        case 1: {
-                            g.setName(st);
-                        }
-
-                        case 2: {
-                            g.setLatitude(st);
-                        }
-
-                        case 3: {
-                            g.setLongitude(st);
-                        }
-
-                        case 4: {
-                            g.setType(GarbageType.getEnumByText(st));
-                        }
-
-                        case 5: {
-                            g.setDescription(st);
-                        }
-
-                        case 6: {
-                            g.setDate(LocalDateTime.parse(st));
-                        }
-                    }
-
-                    i++;
-                    gb.add(g);
+            for (String s : str) {
+                if (s.equals("getBins:success")) {
+                    continue;
                 }
+                arr.add(s);
             }
 
-            map.putExtra("gb", gb);
+            map.putStringArrayListExtra("binsArray", arr);
             map.putExtra("isBinsLoaded", true);
             context.startActivity(map);
+        } else if (result.contains("getBin:success")) {
+            Intent details = new Intent(this.context, DetailsActivity.class);
+
+            details.putExtra("isBinLoaded", true);
+            details.putExtra("bin", result);
+            context.startActivity(details);
+        } else if (result.equals("deleteBin:success")){
+            Intent details = new Intent(this.context, MapsActivity.class);
+            context.startActivity(details);
         }
 
+    }
+
+    public static User getUSER() {
+        return USER;
+    }
+
+    public static void setUSER(User USER) {
+        PHPExecuteActivity.USER = USER;
     }
 }

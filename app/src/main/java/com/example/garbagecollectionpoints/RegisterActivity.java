@@ -67,7 +67,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void initObjects() {
         inputValidation = new Validation(activity);
         databaseHelper = new DBHelper(activity);
-        user = new User();
+        //user = new User();
     }
     /**
      * This implemented method is to listen the click on view

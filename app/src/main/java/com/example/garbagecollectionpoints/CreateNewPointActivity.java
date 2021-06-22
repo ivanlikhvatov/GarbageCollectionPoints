@@ -58,21 +58,9 @@ public class CreateNewPointActivity extends AppCompatActivity implements View.On
     }
 
     private void savePoint() {
-        /*SQLiteDatabase database = dbHelper.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-
-        contentValues.put(DBConstants.KEY_ID.getName(), garbagePoint.getId());
-        contentValues.put(DBConstants.KEY_NAME.getName(), garbagePoint.getName());
-        contentValues.put(DBConstants.KEY_LATITUDE.getName(), garbagePoint.getLatitude());
-        contentValues.put(DBConstants.KEY_LONGITUDE.getName(), garbagePoint.getLongitude());
-        contentValues.put(DBConstants.KEY_DESCRIPTION.getName(), garbagePoint.getDescription());
-        contentValues.put(DBConstants.KEY_DATE.getName(), garbagePoint.getDate().toString());
-        contentValues.put(DBConstants.KEY_TYPE.getName(), garbagePoint.getType().toString());
-
-        database.insert(DBConstants.TABLE_POINTS.getName(), null, contentValues);*/
-
         new PHPExecuteActivity(this).execute(
                 "createBin",
+                garbagePoint.getId(),
                 garbagePoint.getName(),
                 garbagePoint.getLatitude(),
                 garbagePoint.getLongitude(),

@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,16 +45,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isLogged = false;
     private boolean isAdmin = false;
     private boolean isBinsLoaded = false;
-    private ArrayList<GarbagePoint> gb;
+    private ArrayList<String> gb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        isLogged = intent.getBooleanExtra("isLogged", false);
-        isAdmin = intent.getBooleanExtra("isAdmin", false);
-        //gb = intent.get
+        isLogged = PHPExecuteActivity.getUSER().isLogged();
+        isAdmin = PHPExecuteActivity.getUSER().isAdmin();
+        gb = intent.getStringArrayListExtra("binsArray");
         isBinsLoaded = intent.getBooleanExtra("isBinsLoaded", false);
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
@@ -63,7 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        dbHelper = new DBHelper(this);
+        //dbHelper = new DBHelper(this);
 
         btnFind = findViewById(R.id.btnFind);
         btnFind.setOnClickListener(this);
@@ -115,9 +116,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
 
-        Intent intent = new Intent(MapsActivity.this, DetailsActivity.class);
-        intent.putExtra("coordinate", marker.getPosition());
-        startActivity(intent);
+        //Intent intent = new Intent(MapsActivity.this, DetailsActivity.class);
+        //intent.putExtra("coordinate", marker.getPosition());
+        //startActivity(intent);
+        String latitude = Double.toString(marker.getPosition().latitude);
+        String longitude = Double.toString(marker.getPosition().longitude);
+        String pointId = (latitude + longitude).replaceAll("\\.", "");
+
+        new PHPExecuteActivity(this).execute(
+                "getBinById",
+                pointId
+        );
+        return;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -130,66 +140,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void printAllGarbage(GoogleMap googleMap) throws IOException {
         map = googleMap;
 
-        //SQLiteDatabase database = dbHelper.getWritableDatabase();
-
-        //ArrayList<GarbagePoint> gp;
-
         if (!isBinsLoaded) {
             new PHPExecuteActivity(this).execute("getAllBins");
             return;
         }
 
+        for (String g : gb) {
+            System.out.println(g);
+            String p = "\\*";
+            String[] str = g.split(p);
+            LatLng coordinates = new LatLng(Double.parseDouble(str[2]), Double.parseDouble(str[3]));
+            MarkerOptions markerOptions = new MarkerOptions().position(coordinates).title(str[1]);
 
+            Marker marker = map.addMarker(markerOptions);
 
-        /*Cursor cursor = database.query(
-                DBConstants.TABLE_POINTS.getName(),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );*/
+            if (GarbageType.COMPOST_BIN.equals(GarbageType.valueOf(str[4]))) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
+            }
 
-        /*if (cursor.moveToFirst()) {
-            int nameIndex = cursor.getColumnIndex(DBConstants.KEY_NAME.getName());
-            int latitudeIndex = cursor.getColumnIndex(DBConstants.KEY_LATITUDE.getName());
-            int longitudeIndex = cursor.getColumnIndex(DBConstants.KEY_LONGITUDE.getName());
-            int typeIndex = cursor.getColumnIndex(DBConstants.KEY_TYPE.getName());
+            if (GarbageType.GLASS_BIN.equals(GarbageType.valueOf(str[4]))) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.blue));
+            }
 
-            do {
-                double latitude = Double.parseDouble(cursor.getString(latitudeIndex));
-                double longitude = Double.parseDouble(cursor.getString(longitudeIndex));
-                String name = cursor.getString(nameIndex);
-                String type = cursor.getString(typeIndex);
+            if (GarbageType.PACKING_MATERIAL_BIN.equals(GarbageType.valueOf(str[4]))) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
+            }
 
-                LatLng coordinates = new LatLng(latitude, longitude);
-                MarkerOptions markerOptions = new MarkerOptions().position(coordinates).title(name);
-
-                Marker marker = map.addMarker(markerOptions);
-
-                if (GarbageType.COMPOST_BIN.toString().equals(type)){
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green));
-                }
-
-                if (GarbageType.GLASS_BIN.toString().equals(type)){
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.blue));
-                }
-
-                if (GarbageType.PACKING_MATERIAL_BIN.toString().equals(type)){
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red));
-                }
-
-                if (GarbageType.PAPER_BIN.toString().equals(type)){
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.yellow));
-                }
-
-            } while (cursor.moveToNext());
-        } else {
-            Log.d("mLog", "0 rows");
-        }*/
-
-        //cursor.close();
+            if (GarbageType.PAPER_BIN.equals(GarbageType.valueOf(str[4]))) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.yellow));
+            }
+        }
     }
 
     @Override
